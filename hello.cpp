@@ -19,8 +19,8 @@
 //Función lerp
 Punto lerp(Punto p1,Punto p2, double t)
 {
-    double x = static_cast<double>((1-t)*p1.getX() + t*p2.getX());
-    double y = static_cast<double>((1-t)*p1.getY() + t*p2.getY());
+    double x = static_cast<double>((1-t)*p1.getX() + t*p2.getX()); //Interpolación en X
+    double y = static_cast<double>((1-t)*p1.getY() + t*p2.getY()); //Interpolaciñon en Y
     return Punto(x,y);
 }
 
@@ -78,7 +78,7 @@ void cuadrado(Punto p1, Punto p2, uint32_t color)
 {
     double dist = distancia(p1, p2);
     if(p1.getY() == p2.getY()){
-        Punto p3(p1.getX(), p1.getY()+dist);
+        Punto p3(p1.getX(), p1.getY()+dist); //Calcula las coordenadas de los otros puntos
         Punto p4(p2.getX(), p2.getY()+dist);
 
         linea(p1, p2, color);
@@ -91,15 +91,33 @@ void cuadrado(Punto p1, Punto p2, uint32_t color)
 }
 
 //Función para pintar un triángulo
-void triangulo()
-{}
+void triangulo(Punto p1, Punto p2, Punto p3, uint32_t color)
+{
+    linea(p1, p2, color);
+    linea(p2, p3, color);
+    linea(p3, p1, color);
+}
 
 //Función para pintar hexágono
-void hexagono()
-{}
+void hexagono(Punto centro, double radio, uint32_t color)
+{
+    std::vector<Punto> puntos(6);
 
-//Función para pintar un fractal
+    //Calculo de los 6 vértices
+    for (int i = 0; i < 6; i++) {
+        double alfa = (2 * PI * i) / 6;
+        double x = centro.getX() + radio * cos(alfa);
+        double y = centro.getY() + radio * sin(alfa);
+        puntos[i] = Punto(x, y);
+    }
 
+    //Pintamos las 6 líneas
+    for (int i = 0; i < 6; i++) {
+        linea(puntos[i], puntos[(i + 1) % 6], color);
+    }
+}
+
+//Función para pintar puntos
 void pinta(int x, int y, uint32_t color)
 {
     int index = (y * width + x) * 4;
@@ -128,36 +146,69 @@ std::cout << "Inicializando" << std::endl;
 
 }
 
+//Función con el  menú
+void mostrarMenu()
+{
+    std::cout << "\n=== Menú de figuras ===\n";
+    std::cout << "0. Línea\n";
+    std::cout << "1. Cuadrado\n";
+    std::cout << "2. Triángulo\n";
+    std::cout << "3. Hexágono\n";
+    std::cout << "4. Salir\n";
+    std::cout << "Selecciona una opción: ";
+}
+
 //funciones de figuras
 
 int main() {
+    initPixels(0x000000FF);  
 
-    initPixels(0x000000FF);
     // Crear una textura y un sprite para mostrar la imagen
     sf::Texture texture;
     texture.create(width, height);
-    Punto p1(100,200);
-    Punto p2(400,200);
-    Punto p3(400,400);
+    
+    Punto p1(100, 200);
+    Punto p2(400, 200);
+    Punto p3(400, 400);
+    Punto p4(250, 450);
 
-    std::cout << "Pintando pixeles" << std::endl;
-    //pinta(300,300,0xFF0000FF);
-    //pinta(500,300,0x00FF00FF);
-    //pinta(300,500,0x00FFFF);
-    //pinta(700,300,0xFF00FFFF);
-    //circulo(400,300,50,blanco);
-    //linea(p1,p3, rojo);
-    cuadrado(p1,p2,amarillo);
+    int opcion;
+    
+    //Mostrar menú
+    mostrarMenu();
+    std::cin >> opcion;
 
+    //Limpiar la pantalla
+    initPixels(0x000000FF);
 
+    switch(opcion) {
+        case 0:
+            linea(p1,p2, rojo);
+            break;
+        case 1:
+            cuadrado(p1, p2, amarillo);  
+            break;
+        case 2:
+            triangulo(p1, p2, p4, cyan);  
+            break;
+        case 3:
+            hexagono(p3, 100, magenta); 
+            break;
+        case 4:
+            std::cout << "¡Adiós!\n";
+            return 0;
+        default:
+            std::cout << "Opción no válida.\n";
+            return 1;
+    }
 
-    std::cout << "Cargar los píxeles en la textura" << std::endl;
+    // Cargar los píxeles en la textura
     texture.update(pixels.data());
 
-    std::cout << "Crear un sprite para mostrar la textura" << std::endl;
+    // Crear un sprite para mostrar la textura
     sf::Sprite sprite(texture);
 
-    std::cout << "Crear una ventana" << std::endl;
+    // Crear una ventana
     sf::RenderWindow window(sf::VideoMode(width, height), "Display Image from Array");
 
     // Bucle principal de la ventana

@@ -4,6 +4,9 @@ class Punto{
         double y;
       
     public:
+        // Método constructor por defecto
+        Punto() : x(0), y(0) {} 
+
         // Método contructor
         Punto(double _x, double _y) : x(_x), y(_y){}
 
